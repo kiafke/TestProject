@@ -44,6 +44,8 @@ protected:
 	/** Bound to the horizontal axis */
 	void MoveRightInput(float Val);
 
+	void Fire();
+
 private:
 
 	/** How quickly forward speed changes */

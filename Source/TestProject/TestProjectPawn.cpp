@@ -8,6 +8,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Engine/World.h"
 #include "Engine/StaticMesh.h"
+#include "DrawDebugHelpers.h"
+#include "Components/TimelineComponent.h"
+#include "Components/BoxComponent.h"
 
 ATestProjectPawn::ATestProjectPawn()
 {
@@ -32,7 +35,7 @@ ATestProjectPawn::ATestProjectPawn()
 	SpringArm->SetupAttachment(RootComponent);	// Attach SpringArm to RootComponent
 	SpringArm->TargetArmLength = 160.0f; // The camera follows at this distance behind the character	
 	SpringArm->SocketOffset = FVector(0.f,0.f,60.f);
-	SpringArm->bEnableCameraLag = false;	// Do not allow camera to lag
+	SpringArm->bEnableCameraLag = true;	// Do not allow camera to lag
 	SpringArm->CameraLagSpeed = 15.f;
 
 	// Create camera component 
@@ -50,10 +53,10 @@ ATestProjectPawn::ATestProjectPawn()
 
 void ATestProjectPawn::Tick(float DeltaSeconds)
 {
-	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
+//	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
 
 	// Move plan forwards (with sweep so we stop when we collide with things)
-	AddActorLocalOffset(LocalMove, true);
+//	AddActorLocalOffset(LocalMove, true);
 
 	// Calculate change in rotation this frame
 	FRotator DeltaRotation(0,0,0);
@@ -64,6 +67,58 @@ void ATestProjectPawn::Tick(float DeltaSeconds)
 	// Rotate plane
 	AddActorLocalRotation(DeltaRotation);
 
+	
+	//
+	//Hit contains information about what the raycast hit.
+	FHitResult Hit;
+
+	//The length of the ray in units.
+	//For more flexibility you can expose a public variable in the editor
+	float RayLength = 20000;
+
+	//The Origin of the raycast
+
+
+
+
+
+	FVector StartLocation = PlaneMesh->GetSocketLocation("Gun");
+
+
+
+	//FVector ActorForward = PlaneMesh->GetForwardVector();
+
+	FRotator ActorRotation = PlaneMesh->GetSocketRotation("Gun");
+
+
+
+	//FVector ForwardVector = FRotationMatrix(ActorRotation).GetScaledAxis(EAxis::X);
+	//FVector ForwardVector= GetActorForwardVector();
+	//FVector ForwardAmount = FVector(5000.f, 00.f, 00.f);
+
+	FVector ForwardVector = FRotationMatrix(ActorRotation).GetScaledAxis(EAxis::X);
+	//FVector StartLocation = PlaneMesh->GetSocketLocation("Gun");
+	//The EndLocation of the raycast
+
+
+
+	//FVector EndLocationRotator = ForwardVector.RotateAngleAxis(180, FVector(1, 0, 0));
+	FVector EndLocation = StartLocation + (ForwardVector)*2000;
+
+	//Collision parameters. The following syntax means that we don't want the trace to be complex
+	FCollisionQueryParams CollisionParameters;
+
+	//Perform the line trace
+	//The ECollisionChannel parameter is used in order to determine what we are looking for when performing the raycast
+	ActorLineTraceSingle(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_WorldDynamic, CollisionParameters);
+
+	//DrawDebugLine is used in order to see the raycast we performed
+	//The boolean parameter used here means that we want the lines to be persistent so we can see the actual raycast
+	//The last parameter is the width of the lines.
+	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, true, -1, 0, 1.f);
+
+
+	//
 	// Call any parent class Tick implementation
 	Super::Tick(DeltaSeconds);
 }
@@ -87,6 +142,10 @@ void ATestProjectPawn::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	PlayerInputComponent->BindAxis("Thrust", this, &ATestProjectPawn::ThrustInput);
 	PlayerInputComponent->BindAxis("MoveUp", this, &ATestProjectPawn::MoveUpInput);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ATestProjectPawn::MoveRightInput);
+
+	// Set up gameplay key bindings
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed,this, &ATestProjectPawn::Fire);
 }
 
 void ATestProjectPawn::ThrustInput(float Val)
@@ -130,4 +189,9 @@ void ATestProjectPawn::MoveRightInput(float Val)
 
 	// Smoothly interpolate roll speed
 	//CurrentRollSpeed = FMath::FInterpTo(CurrentRollSpeed, TargetRollSpeed, GetWorld()->GetDeltaSeconds(), 2.f);
+}
+void ATestProjectPawn::Fire()
+{
+
+	
 }
