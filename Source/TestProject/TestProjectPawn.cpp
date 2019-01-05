@@ -53,10 +53,10 @@ ATestProjectPawn::ATestProjectPawn()
 
 void ATestProjectPawn::Tick(float DeltaSeconds)
 {
-//	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
+	const FVector LocalMove = FVector(CurrentForwardSpeed * DeltaSeconds, 0.f, 0.f);
 
 	// Move plan forwards (with sweep so we stop when we collide with things)
-//	AddActorLocalOffset(LocalMove, true);
+	AddActorLocalOffset(LocalMove, true);
 
 	// Calculate change in rotation this frame
 	FRotator DeltaRotation(0,0,0);
@@ -74,7 +74,7 @@ void ATestProjectPawn::Tick(float DeltaSeconds)
 
 	//The length of the ray in units.
 	//For more flexibility you can expose a public variable in the editor
-	float RayLength = 20000;
+	float RayLength = 200000;
 
 	//The Origin of the raycast
 
