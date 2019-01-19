@@ -11,6 +11,7 @@
 #include "DrawDebugHelpers.h"
 #include "Components/TimelineComponent.h"
 #include "Components/BoxComponent.h"
+#include "DamagedInterface.h"
 
 ATestProjectPawn::ATestProjectPawn()
 {
@@ -24,7 +25,7 @@ ATestProjectPawn::ATestProjectPawn()
 		}
 	};
 	static FConstructorStatics ConstructorStatics;
-
+	
 	// Create static mesh component
 	PlaneMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlaneMesh0"));
 	PlaneMesh->SetStaticMesh(ConstructorStatics.PlaneMesh.Get());	// Set static mesh
@@ -48,6 +49,7 @@ ATestProjectPawn::ATestProjectPawn()
 	TurnSpeed = 100.f;
 	MaxSpeed = 5000.f;
 	MinSpeed = 2000.f;
+	RotateSpeed = 5.f;
 	CurrentForwardSpeed = 2000.f;
 }
 
@@ -68,6 +70,8 @@ void ATestProjectPawn::Tick(float DeltaSeconds)
 	AddActorLocalRotation(DeltaRotation);
 
 	
+
+
 	//
 	//Hit contains information about what the raycast hit.
 	FHitResult Hit;
@@ -78,19 +82,11 @@ void ATestProjectPawn::Tick(float DeltaSeconds)
 
 	//The Origin of the raycast
 
-
-
-
-
 	FVector StartLocation = PlaneMesh->GetSocketLocation("Gun");
-
-
 
 	//FVector ActorForward = PlaneMesh->GetForwardVector();
 
 	FRotator ActorRotation = PlaneMesh->GetSocketRotation("Gun");
-
-
 
 	//FVector ForwardVector = FRotationMatrix(ActorRotation).GetScaledAxis(EAxis::X);
 	//FVector ForwardVector= GetActorForwardVector();
@@ -142,10 +138,14 @@ void ATestProjectPawn::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	PlayerInputComponent->BindAxis("Thrust", this, &ATestProjectPawn::ThrustInput);
 	PlayerInputComponent->BindAxis("MoveUp", this, &ATestProjectPawn::MoveUpInput);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ATestProjectPawn::MoveRightInput);
+	
+
+
 
 	// Set up gameplay key bindings
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed,this, &ATestProjectPawn::Fire);
+	PlayerInputComponent->BindAction("RotateLeft", IE_Repeat, this, &ATestProjectPawn::RotateLeft);
 }
 
 void ATestProjectPawn::ThrustInput(float Val)
@@ -194,4 +194,16 @@ void ATestProjectPawn::Fire()
 {
 
 	
+}
+void ATestProjectPawn::OnHit() {
+
+
+}
+void ATestProjectPawn::RotateLeft() {
+
+	FRotator CurrentRotation = this->GetActorRotation();
+	FRotator TargetRotation = CurrentRotation + FRotator(0.f, 0.f, 30.f);
+	//this->SetActorRotation(FMath::(Lerp(CurrentRotation,FQuat(TargetRotation))))
+	//GetOwner()->SetActorRotation(FMath::Lerp(CurrentRotation,)
+
 }
