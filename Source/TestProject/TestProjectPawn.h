@@ -3,10 +3,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "DamagedInterface.h"
 #include "TestProjectPawn.generated.h"
 
 UCLASS(Config=Game)
-class ATestProjectPawn : public APawn
+class ATestProjectPawn : public APawn, public IDamagedInterface
 {
 	GENERATED_BODY()
 
@@ -27,6 +28,8 @@ public:
 	// Begin AActor overrides
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, class AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+	
+	
 	// End AActor overrides
 
 protected:
@@ -44,8 +47,12 @@ protected:
 	/** Bound to the horizontal axis */
 	void MoveRightInput(float Val);
 
+	/** Bound to the rotation axis */
+	void RotateLeft();
+	void RotateRight();
 	void Fire();
-
+	void OnHit();
+	
 private:
 
 	/** How quickly forward speed changes */
@@ -76,6 +83,12 @@ private:
 	/** Current roll speed */
 	float CurrentRollSpeed;
 
+	UPROPERTY(Category = Plane, EditAnywhere)
+		float MaxHealth;
+	UPROPERTY(Category = Plane, EditAnywhere)
+		float CurrentHealth;
+	UPROPERTY(Category = Pitch, EditAnywhere)
+		float RotateSpeed;
 public:
 	/** Returns PlaneMesh subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetPlaneMesh() const { return PlaneMesh; }
