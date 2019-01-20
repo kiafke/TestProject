@@ -152,48 +152,53 @@ void ATestProjectPawn::MoveRightInput(float Val)
 }
 void ATestProjectPawn::Fire()
 {
-	//
-	//Hit contains information about what the raycast hit.
-	FHitResult Hit;
+		//
+		//Hit contains information about what the raycast hit.
+		FHitResult Hit;
 
-	//The length of the ray in units.
-	//For more flexibility you can expose a public variable in the editor
-	float RayLength = 200000;
+		//The length of the ray in units.
+		//For more flexibility you can expose a public variable in the editor
+		float RayLength = 20000000;
 
-	//The Origin of the raycast
+		//The Origin of the raycast
 
-	FVector StartLocation = PlaneMesh->GetSocketLocation("Gun");
+		FVector StartLocation = PlaneMesh->GetSocketLocation("Gun");
 
-	//FVector ActorForward = PlaneMesh->GetForwardVector();
+		//FVector ActorForward = PlaneMesh->GetForwardVector();
 
-	FRotator ActorRotation = PlaneMesh->GetSocketRotation("Gun");
+		FRotator ActorRotation = PlaneMesh->GetSocketRotation("Gun");
 
-	//FVector ForwardVector = FRotationMatrix(ActorRotation).GetScaledAxis(EAxis::X);
-	//FVector ForwardVector= GetActorForwardVector();
-	//FVector ForwardAmount = FVector(5000.f, 00.f, 00.f);
+		//FVector ForwardVector = FRotationMatrix(ActorRotation).GetScaledAxis(EAxis::X);
+		//FVector ForwardVector= GetActorForwardVector();
+		//FVector ForwardAmount = FVector(5000.f, 00.f, 00.f);
 
-	FVector ForwardVector = FRotationMatrix(ActorRotation).GetScaledAxis(EAxis::X);
-	//FVector StartLocation = PlaneMesh->GetSocketLocation("Gun");
-	//The EndLocation of the raycast
+		FVector ForwardVector = FRotationMatrix(ActorRotation).GetScaledAxis(EAxis::X);
+		//FVector StartLocation = PlaneMesh->GetSocketLocation("Gun");
+		//The EndLocation of the raycast
 
 
 
-	//FVector EndLocationRotator = ForwardVector.RotateAngleAxis(180, FVector(1, 0, 0));
-	FVector EndLocation = StartLocation + (ForwardVector) * 2000;
+		//FVector EndLocationRotator = ForwardVector.RotateAngleAxis(180, FVector(1, 0, 0));
+		FVector EndLocation = StartLocation + (ForwardVector) * RayLength;
 
-	//Collision parameters. The following syntax means that we don't want the trace to be complex
-	FCollisionQueryParams CollisionParameters;
+		//Collision parameters. The following syntax means that we don't want the trace to be complex
+		FCollisionQueryParams CollisionParameters;
+		//CollisionParameters.AddIgnoredActor(this);
+		CollisionParameters.bTraceComplex = true;
 
-	//Perform the line trace
-	//The ECollisionChannel parameter is used in order to determine what we are looking for when performing the raycast
-	ActorLineTraceSingle(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_WorldDynamic, CollisionParameters);
+		//Perform the line trace
+		//The ECollisionChannel parameter is used in order to determine what we are looking for when performing the raycast
+		if (GetWorld()->LineTraceSingleByChannel(Hit, StartLocation, EndLocation, ECollisionChannel::ECC_WorldStatic, CollisionParameters))
+		{
+			UE_LOG(LogTemp, Log, TEXT("Target hit!"))
+		}
 
-	//DrawDebugLine is used in order to see the raycast we performed
-	//The boolean parameter used here means that we want the lines to be persistent so we can see the actual raycast
-	//The last parameter is the width of the lines.
-	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, true, -1, 0, 1.f);
+		//DrawDebugLine is used in order to see the raycast we performed
+		//The boolean parameter used here means that we want the lines to be persistent so we can see the actual raycast
+		//The last parameter is the width of the lines.
+		DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, true, -1, 0, 1.f);
 
-	
+
 }
 void ATestProjectPawn::OnHit() {
 
